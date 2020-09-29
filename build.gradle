@@ -4,9 +4,14 @@ plugins {
 	id 'java'
 }
 
-group = 'com.practo'
+project.group = 'com.practo'
 version = '0.0.1-SNAPSHOT'
+//version = getVersion()
 sourceCompatibility = '11'
+
+jacoco{
+	toolVersion='0.8.2'
+}
 
 configurations {
 	compileOnly {
@@ -24,10 +29,42 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
 	annotationProcessor 'org.projectlombok:lombok'
+	
+	compile("org.springframework.cloud:spring-cloud-spring-service-connector:1.2.1.RELEASE")
+	compile("org.springframework.cloud:spring-cloud-cloudfoundry-connector:1.2.1.RELEASE")
+	compile("org.cloudfoundry:auto-reconfiguration:1.12.0.RELEASE")
+	
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 }
+sonarqube{
+	properties{		
+			//property "sonar.host.url", "http://sonarqube2.practo.com/" 
+			property "sonar.host.url", "http://localhost:9000/"
+			property "sonar.projectKey", "${project.group}:${project.name}"
+			property "sonar.projectName", "${project.name}"
+			property "sonar.coverage.exclusions", "**/src/main/resources/*,**/src/main/java/com/practo/config/*.java,**/src/main/java/com/practo/constant/*.java,**/src/main/java/com/practo/enums/*.java,**/src/main/java/com/practo/entity/*.java,**/src/main/java/com/practo/model/*.java,**/src/main/java/com/practo/exception/*.java"
+			property "sonar.projectVersion", "${rootProject.version}"
+			property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
+			property "sonar.scm.provider", "git"
+			property "sonar.language", "java"
+			//property "sonar.sources", "src/main/java"
+			}
+		}
+
+/*getVersion() {
+	if(project.hasProperty('ARTIFACT_TYPE')) {
+		if("$ARTIFACT_TYPE"=="RELEASE") {
+			return "$RELEASE_VERSION"
+		}
+		else {
+			return "$SANPSHOT_VERSION".split("-") [0]+"-SANPSHOT"
+		}
+	else {
+		return "0.0.1-SANPSHOT"
+	}
+}*/
 
 test {
 	useJUnitPlatform()
